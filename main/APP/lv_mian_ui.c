@@ -378,14 +378,14 @@ void lv_mian_ui(void)
     main_ui.mian_inter.mian_time_text = lv_label_create(main_ui.mian_box);
     lv_label_set_text(main_ui.mian_inter.mian_time_text," ");
     lv_obj_set_style_text_color(main_ui.mian_inter.mian_time_text,lv_color_hex(0xFFFFFF),LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(main_ui.mian_inter.mian_time_text,&lv_font_montserrat_48,LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(main_ui.mian_inter.mian_time_text,&lv_font_montserrat_14,LV_STATE_DEFAULT);
     lv_obj_set_size(main_ui.mian_inter.main_mini_obx,lv_obj_get_width(lv_scr_act()),20);
     lv_obj_set_pos(main_ui.mian_inter.main_mini_obx, -15, -15);
 
     /* 图标 */
     main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
     lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
-    lv_obj_set_size(main_ui.mian_inter.ico[ico_num], camera.header.w, camera.header.h);
+    lv_obj_set_size(main_ui.mian_inter.ico[ico_num], Photo.header.w, Photo.header.h);
     lv_obj_align(main_ui.mian_inter.ico[ico_num],LV_ALIGN_BOTTOM_MID,0,0);
     lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
     lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
