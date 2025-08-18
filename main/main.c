@@ -9,6 +9,16 @@
 #include "usart.h"
 #include "lcd_display.h"
 
+#include "myiic.h"
+#include "xl9555.h"
+#include "lvgl_demo.h"
+#include "my_spi.h"
+#include "key.h"
+
+#include "myi2s.h"
+#include "exfuns.h"
+#include "esp_rtc.h"
+#include "es8311.h"
 
 //// 全局变量
 // #define UART_BUF_SIZE      1024             // 缓冲区大小
@@ -23,33 +33,51 @@ void app_main(void) {
     esp_err_t ret;
 
     // 初始化NVS
-    ret = nvs_flash_init();            
+    ret = nvs_flash_init();
+    
+    lcd_cfg_t lcd_config_info = {0};
+    lcd_config_info.notify_flush_ready = NULL;
+    lcd_config_info.user_ctx = &disp_drv;
+
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ESP_ERROR_CHECK(nvs_flash_init());
     }
 
     // 初始化外设
-    led_init();                         /* 初始化LED */
-    myiic_init();                       /* IIC初始化 */
-    xl9555_init();                      /* 初始化按键 */
+    //led_init();                         /* 初始化LED */
+   // myiic_init();                       /* IIC初始化 */
+    //xl9555_init();                      /* 初始化按键 */
     
 
-    lcd_display_init();                /* 初始化显示 */
+    //lcd_display_init();                /* 初始化显示 */
     
     // 初始化UART
     uart_comm_init();
     
+    myiic_init();                       /* 初始化IIC0 */
+    my_spi_init();                      /* 初始化SPI */
+    led_init();                         /* 初始化LED */
+    key_init();                         /* 初始化KEY */
+    xl9555_init();                      /* 初始化IO扩展芯片 */
+    myi2s_init();                       /* 初始化I2S */
+    rtc_set_time(2024,06,25,18,32,00);  /* 设置RTC时间 */
+    lcd_init(lcd_config_info);          /* 初始化LCD */
+    es8311_init(I2S_SAMPLE_RATE);       /* ES8311初始化 */
+    es8311_set_voice_volume(15);        /* 设置喇叭音量，建议不超过65 */
+    es8311_set_voice_mute(0);           /* 打开DAC */
+    lvgl_demo();
+
     // 创建通信和显示任务
-    uart_create_receive_task();
-    uart_create_send_task();
-    lcd_create_display_task();
+    // uart_create_receive_task();
+    // uart_create_send_task();
+    // lcd_create_display_task();
     
     // 主循环状态指示
-    while (1) {
-        LED_TOGGLE();                  // 闪烁LED表示系统运行
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
+    // while (1) {
+    //     LED_TOGGLE();                  // 闪烁LED表示系统运行
+    //     vTaskDelay(pdMS_TO_TICKS(500));
+    // }
 }
 
 

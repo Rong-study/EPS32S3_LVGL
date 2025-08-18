@@ -1,33 +1,90 @@
 dependencies:
-  espressif/esp_lcd_touch:
-    component_hash: d4d8f2dc33205797169a97a02e0d89a8982f59fe0509129b54422052b8522f59
+  espressif/cmake_utilities:
+    component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.1'
     source:
-      storage_url: file:///G:/360Downloads/ESP-IDF/Espressif/registry
+      registry_url: https://components.espressif.com
       type: service
-    version: 1.1.1
-  espressif/esp_lcd_touch_ft5x06:
-    component_hash: 97759953d9436a365e9427078c5b04ecce4e6a50f50cf62c68cd6bfa229b812c
+    version: 0.5.3
+  espressif/esp_tinyusb:
+    component_hash: 96d232ced7afe1976119b62f7fbf1944a2a78b36228ff6f7b9318394ac1153cc
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    - name: espressif/tinyusb
+      registry_url: https://components.espressif.com
+      require: public
+      version: '>=0.14.2'
     source:
-      storage_url: file:///G:/360Downloads/ESP-IDF/Espressif/registry
+      registry_url: https://components.espressif.com/
       type: service
-    version: 1.0.6
-  espressif/esp_lcd_touch_gt911:
-    component_hash: 20ac25d1439dbe177764dbed9cd868388fecb052380b5349f2e9e370013ca76a
+    version: 1.7.6~1
+  espressif/tinyusb:
+    component_hash: aa65639878f27a44d349044afd9c3fc134a92bd560874fdac1d836019b5c07ca
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
     source:
-      storage_url: file:///G:/360Downloads/ESP-IDF/Espressif/registry
+      registry_url: https://components.espressif.com
       type: service
-    version: 1.1.0
-  espressif/esp_lcd_touch_tt21100:
-    component_hash: 3670f6f3d68c120d680d70ffdf2dc10f6c2a5bea8c0e87521fb92ac2af1f94c5
+    targets:
+    - esp32s2
+    - esp32s3
+    - esp32p4
+    version: 0.18.0~4
+  espressif/usb_stream:
+    component_hash: 130b26080cb06ea826a4b9371b6ced927034ba0cbbe0a13bbe408d10d5ca2972
+    dependencies:
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.5.*
+    - name: idf
+      require: private
+      version: '>=4.4.1'
     source:
-      storage_url: file:///G:/360Downloads/ESP-IDF/Espressif/registry
+      registry_url: https://components.espressif.com/
       type: service
-    version: 1.1.0
+    targets:
+    - esp32s2
+    - esp32s3
+    version: 1.5.1
   idf:
-    component_hash: null
     source:
       type: idf
-    version: 5.2.1
-manifest_hash: 9625597a148fb71d3a1ec721d59957e13173c6ee54901e890400af308e0467d8
+    version: 5.3.1
+  lijunru-hub/esp-ppbuffer:
+    component_hash: d27fa07485f06b8589a0218502f174cedbffc18ef082d4a1f811c8ad0eb22f41
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.4.0'
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.*
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 0.1.0
+  lvgl/lvgl:
+    component_hash: d7c1ac037ae6e85d94897f807d6e7ba0946a83e720074fc95a4f6241da9f9f53
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 8.4.0
+direct_dependencies:
+- espressif/esp_tinyusb
+- espressif/usb_stream
+- idf
+- lijunru-hub/esp-ppbuffer
+- lvgl/lvgl
+manifest_hash: 3c28a66858e5201468a2fba1a806e5bb869a4504eba23decf387bd881b34f79b
 target: esp32s3
-version: 1.0.0
+version: 2.0.0

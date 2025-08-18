@@ -18,10 +18,10 @@ void lcd_display_init(void) {
     lcd_init(lcd_config_info);          /* 初始化LCD */
     
     // 初始化显示内容
-    lcd_clear(WHITE);
-    lcd_show_string(10, 10, 240, 32, 32, "UART STM32-ESP32", RED);
-    lcd_show_string(10, 60, 240, 20, 16, "-------------------", BLUE);
-    lcd_show_string(10, 80, 240, 16, 24, "RX:", BLACK);
+    //lcd_clear(WHITE);
+    // lcd_show_string(10, 10, 240, 32, 32, "UART STM32-ESP32", RED);
+    // lcd_show_string(10, 60, 240, 20, 16, "-------------------", BLUE);
+    // lcd_show_string(10, 80, 240, 16, 24, "RX:", BLACK);
     
     ESP_LOGI(TAG, "LCD_init OK");
 }
