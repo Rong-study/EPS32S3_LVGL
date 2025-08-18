@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "11_lcd",
-    "project_version":    "c0722ca-dirty",
+    "project_version":    "47740a1-dirty",
     "project_path":       "C:/Users/118472/Desktop/ESP_project/10_lcd_1",
     "idf_path":           "D:/ESP-IDF/Espressif/frameworks/esp-idf-v5.3.1",
     "build_dir":          "C:/Users/118472/Desktop/ESP_project/10_lcd_1/build",

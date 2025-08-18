@@ -377,8 +377,8 @@ void lv_mian_ui(void)
     /* 时间 */
     main_ui.mian_inter.mian_time_text = lv_label_create(main_ui.mian_box);
     lv_label_set_text(main_ui.mian_inter.mian_time_text," ");
-    lv_obj_set_style_text_color(main_ui.mian_inter.mian_time_text,lv_color_hex(0x000000),LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(main_ui.mian_inter.mian_time_text,&lv_font_montserrat_14,LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(main_ui.mian_inter.mian_time_text,lv_color_hex(0xFFFFFF),LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(main_ui.mian_inter.mian_time_text,&lv_font_montserrat_48,LV_STATE_DEFAULT);
     lv_obj_set_size(main_ui.mian_inter.main_mini_obx,lv_obj_get_width(lv_scr_act()),20);
     lv_obj_set_pos(main_ui.mian_inter.main_mini_obx, -15, -15);
 
