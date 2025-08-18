@@ -10,7 +10,7 @@
 #include "lcd_display.h"
 
 
-// // 全局变量
+//// 全局变量
 // #define UART_BUF_SIZE      1024             // 缓冲区大小
 // char g_rx_buf[UART_BUF_SIZE] = {0};        // 接收缓冲区
 // char g_display_str[UART_BUF_SIZE] = {0};   // 显示缓冲区
