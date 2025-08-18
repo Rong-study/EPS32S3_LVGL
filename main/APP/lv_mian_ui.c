@@ -1,16 +1,16 @@
 #include "lv_main_ui.h"
 
 /* 声明ATK LOGO */
-LV_IMG_DECLARE(bg)
-LV_IMG_DECLARE(camera)
-LV_IMG_DECLARE(lv_video)
-LV_IMG_DECLARE(music)
-LV_IMG_DECLARE(Photo)
-LV_IMG_DECLARE(lv_wifi)
-LV_IMG_DECLARE(lv_tf)
-LV_IMG_DECLARE(lv_usb)
-LV_IMG_DECLARE(novoice)
-LV_IMG_DECLARE(cell)
+// LV_IMG_DECLARE(bg)
+// LV_IMG_DECLARE(camera)
+// LV_IMG_DECLARE(lv_video)
+// LV_IMG_DECLARE(music)
+// LV_IMG_DECLARE(Photo)
+// LV_IMG_DECLARE(lv_wifi)
+// LV_IMG_DECLARE(lv_tf)
+// LV_IMG_DECLARE(lv_usb)
+// LV_IMG_DECLARE(novoice)
+// LV_IMG_DECLARE(cell)
 
 LV_IMG_DECLARE(Photo);
 
@@ -238,19 +238,19 @@ static void lv_imgbtn_control_event_handler(lv_event_t *event)
 
         switch(lv_trigger_bit)
         {
-            case 0: /* usb_camera app */
-                usb_camera_ui();
-                break;
+            // case 0: /* usb_camera app */
+            //     usb_camera_ui();
+            //     break;
             
-            case 1: /*  video app */
-                lv_video_ui();
-                break;
+            // case 1: /*  video app */
+            //     lv_video_ui();
+            //     break;
             
-            case 2: /* photo app */
-                //lv_photo_ui();
-                lv_test_ui();
-                break;
-            case 3: /* test app */
+            // case 2: /* photo app */
+            //     lv_photo_ui();
+            //     //lv_test_ui();
+            //     break;
+            case 0: /* test app */
                 lv_test_ui();
                 break;
             default:
@@ -358,73 +358,74 @@ void lv_mian_ui(void)
     lv_obj_clear_flag(main_ui.mian_box, LV_OBJ_FLAG_SCROLLABLE);
 
     /* 主界面的顶层容器 */
-    main_ui.mian_inter.main_mini_obx = lv_obj_create(main_ui.mian_box);
-    lv_obj_set_size(main_ui.mian_inter.main_mini_obx,lv_obj_get_width(lv_scr_act()),20);
-    lv_obj_set_pos(main_ui.mian_inter.main_mini_obx, -15, -15);
-    lv_obj_set_style_bg_color(main_ui.mian_inter.main_mini_obx,lv_color_hex(0x000000),LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(main_ui.mian_inter.main_mini_obx, 0, LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(main_ui.mian_inter.main_mini_obx,LV_OPA_0,LV_STATE_DEFAULT);
-    lv_obj_clear_flag(main_ui.mian_inter.main_mini_obx, LV_OBJ_FLAG_SCROLLABLE);
+    // main_ui.mian_inter.main_mini_obx = lv_obj_create(main_ui.mian_box);
+    // lv_obj_set_size(main_ui.mian_inter.main_mini_obx,lv_obj_get_width(lv_scr_act()),20);
+    // lv_obj_set_pos(main_ui.mian_inter.main_mini_obx, -15, -15);
+    // lv_obj_set_style_bg_color(main_ui.mian_inter.main_mini_obx,lv_color_hex(0x000000),LV_STATE_DEFAULT);
+    // lv_obj_set_style_radius(main_ui.mian_inter.main_mini_obx, 0, LV_STATE_DEFAULT);
+    // lv_obj_set_style_border_opa(main_ui.mian_inter.main_mini_obx,LV_OPA_0,LV_STATE_DEFAULT);
+    // lv_obj_clear_flag(main_ui.mian_inter.main_mini_obx, LV_OBJ_FLAG_SCROLLABLE);
 
     /* 主图背景 */
-    main_ui.mian_inter.mian_imagebg_obx = lv_img_create(main_ui.mian_box);
-    lv_img_set_src(main_ui.mian_inter.mian_imagebg_obx,&bg);
-    lv_obj_set_pos(main_ui.mian_inter.mian_imagebg_obx, -15, 5);
-    lv_obj_set_size(main_ui.mian_inter.mian_imagebg_obx, bg.header.w, bg.header.h);
+    // main_ui.mian_inter.mian_imagebg_obx = lv_img_create(main_ui.mian_box);
+    // lv_img_set_src(main_ui.mian_inter.mian_imagebg_obx,&bg);
+    // lv_obj_set_pos(main_ui.mian_inter.mian_imagebg_obx, -15, 5);
+    // lv_obj_set_size(main_ui.mian_inter.mian_imagebg_obx, bg.header.w, bg.header.h);
 
-    app_obj_general.hidden_parent = main_ui.mian_inter.mian_imagebg_obx;
+    // app_obj_general.hidden_parent = main_ui.mian_inter.mian_imagebg_obx;
 
     /* 时间 */
     main_ui.mian_inter.mian_time_text = lv_label_create(main_ui.mian_box);
     lv_label_set_text(main_ui.mian_inter.mian_time_text," ");
     lv_obj_set_style_text_color(main_ui.mian_inter.mian_time_text,lv_color_hex(0xFFFFFF),LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(main_ui.mian_inter.mian_time_text,&lv_font_montserrat_14,LV_STATE_DEFAULT);
-    lv_obj_align_to(main_ui.mian_inter.mian_time_text,main_ui.mian_inter.mian_imagebg_obx,LV_ALIGN_TOP_LEFT,20,0);
+    lv_obj_set_style_text_font(main_ui.mian_inter.mian_time_text,&lv_font_montserrat_48,LV_STATE_DEFAULT);
+    lv_obj_set_size(main_ui.mian_inter.main_mini_obx,lv_obj_get_width(lv_scr_act()),20);
+    lv_obj_set_pos(main_ui.mian_inter.main_mini_obx, -15, -15);
 
     /* 图标 */
     main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
-    lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &camera, NULL);
+    lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
     lv_obj_set_size(main_ui.mian_inter.ico[ico_num], camera.header.w, camera.header.h);
     lv_obj_align(main_ui.mian_inter.ico[ico_num],LV_ALIGN_BOTTOM_MID,0,0);
     lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
     lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
 
-    ico_num ++;
+    // ico_num ++;
 
-    main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui .mian_inter.mian_imagebg_obx);
-    lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &lv_video, NULL);
-    lv_obj_set_size(main_ui.mian_inter.ico[ico_num], lv_video.header.w, lv_video.header.h);
-    lv_obj_align_to(main_ui.mian_inter.ico[ico_num],main_ui.mian_inter.ico[ico_num - 1],LV_ALIGN_OUT_LEFT_TOP,-lv_video.header.w/2,0);
-    lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
-    lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
+    // main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui .mian_inter.mian_imagebg_obx);
+    // lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &lv_video, NULL);
+    // lv_obj_set_size(main_ui.mian_inter.ico[ico_num], lv_video.header.w, lv_video.header.h);
+    // lv_obj_align_to(main_ui.mian_inter.ico[ico_num],main_ui.mian_inter.ico[ico_num - 1],LV_ALIGN_OUT_LEFT_TOP,-lv_video.header.w/3,0);
+    // lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
+    // lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
 
-    ico_num ++;
+    // ico_num ++;
 
-    main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
-    lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
-    lv_obj_set_size(main_ui.mian_inter.ico[ico_num], Photo.header.w, Photo.header.h);
-    lv_obj_align_to(main_ui.mian_inter.ico[ico_num],main_ui.mian_inter.ico[ico_num - 2],LV_ALIGN_OUT_RIGHT_MID,Photo.header.w/2,0);
-    lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
-    lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
+    // main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
+    // lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
+    // lv_obj_set_size(main_ui.mian_inter.ico[ico_num], Photo.header.w, Photo.header.h);
+    // lv_obj_align_to(main_ui.mian_inter.ico[ico_num],main_ui.mian_inter.ico[ico_num - 2],LV_ALIGN_OUT_RIGHT_MID,Photo.header.w/3,0);
+    // lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
+    // lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
 
 
-    // lv_mian_ui() 函数中，在现有3个图标创建后添加：
+    // // lv_mian_ui() 函数中，在现有3个图标创建后添加：
 
-    ico_num++;  // 此时ico_num为3（新应用索引）
+    // ico_num++;  // 此时ico_num为3（新应用索引）
 
-    // 新增：创建新应用图标
-    main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
-    // 设置图标资源（默认状态下显示new_app图片）
-    lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
-    // 设置图标大小（与图片尺寸一致）
-    lv_obj_set_size(main_ui.mian_inter.ico[ico_num], Photo.header.w, Photo.header.h);
-    // 调整位置（示例：在第三个图标右侧居中对齐，间距为图片宽度的一半）
-    lv_obj_align_to(main_ui.mian_inter.ico[ico_num], main_ui.mian_inter.ico[ico_num - 1], 
-                    LV_ALIGN_OUT_RIGHT_MID, Photo.header.w / 2, 0);
-    // 设置聚焦时的背景透明度（与其他图标保持一致）
-    lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num], LV_OPA_50, LV_STATE_FOCUSED);
-    // 绑定事件回调（复用现有逻辑）
-    lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
+    // // 新增：创建新应用图标
+    // main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
+    // // 设置图标资源（默认状态下显示new_app图片）
+    // lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
+    // // 设置图标大小（与图片尺寸一致）
+    // lv_obj_set_size(main_ui.mian_inter.ico[ico_num], Photo.header.w, Photo.header.h);
+    // // 调整位置（示例：在第三个图标右侧居中对齐，间距为图片宽度的一半）
+    // lv_obj_align_to(main_ui.mian_inter.ico[ico_num], main_ui.mian_inter.ico[ico_num - 3], 
+    //                 LV_ALIGN_OUT_RIGHT_MID, Photo.header.w / 3, 0);
+    // // 设置聚焦时的背景透明度（与其他图标保持一致）
+    // lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num], LV_OPA_50, LV_STATE_FOCUSED);
+    // // 绑定事件回调（复用现有逻辑）
+    // lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
 
 
 
@@ -439,32 +440,32 @@ void lv_mian_ui(void)
         lv_group_focus_obj(main_ui.mian_inter.ico[0]);  /* 聚焦第一个APP */
     }
 
-    main_ui.mini_box.wifi = lv_img_create(main_ui.mian_inter.main_mini_obx);
-    lv_img_set_src(main_ui.mini_box.wifi,&lv_wifi);
-    lv_obj_align(main_ui.mini_box.wifi,LV_ALIGN_LEFT_MID,-5,-2);
-    lv_obj_set_size(main_ui.mini_box.wifi, lv_wifi.header.w, lv_wifi.header.h);
+    // main_ui.mini_box.wifi = lv_img_create(main_ui.mian_inter.main_mini_obx);
+    // lv_img_set_src(main_ui.mini_box.wifi,&lv_wifi);
+    // lv_obj_align(main_ui.mini_box.wifi,LV_ALIGN_LEFT_MID,-5,-2);
+    // lv_obj_set_size(main_ui.mini_box.wifi, lv_wifi.header.w, lv_wifi.header.h);
 
-    main_ui.mini_box.tf = lv_img_create(main_ui.mian_inter.main_mini_obx);
-    lv_img_set_src(main_ui.mini_box.tf,&lv_tf);
-    lv_obj_align_to(main_ui.mini_box.tf,main_ui.mini_box.wifi,LV_ALIGN_OUT_RIGHT_MID,10,0);
-    lv_obj_set_size(main_ui.mini_box.tf, lv_tf.header.w, lv_tf.header.h);
+    // main_ui.mini_box.tf = lv_img_create(main_ui.mian_inter.main_mini_obx);
+    // lv_img_set_src(main_ui.mini_box.tf,&lv_tf);
+    // lv_obj_align_to(main_ui.mini_box.tf,main_ui.mini_box.wifi,LV_ALIGN_OUT_RIGHT_MID,10,0);
+    // lv_obj_set_size(main_ui.mini_box.tf, lv_tf.header.w, lv_tf.header.h);
 
-    main_ui.mini_box.usb = lv_img_create(main_ui.mian_inter.main_mini_obx);
-    lv_img_set_src(main_ui.mini_box.usb,&lv_usb);
-    lv_obj_align_to(main_ui.mini_box.usb,main_ui.mini_box.tf,LV_ALIGN_OUT_RIGHT_MID,10,0);
-    lv_obj_set_size(main_ui.mini_box.usb, lv_usb.header.w, lv_usb.header.h);
+    // main_ui.mini_box.usb = lv_img_create(main_ui.mian_inter.main_mini_obx);
+    // lv_img_set_src(main_ui.mini_box.usb,&lv_usb);
+    // lv_obj_align_to(main_ui.mini_box.usb,main_ui.mini_box.tf,LV_ALIGN_OUT_RIGHT_MID,10,0);
+    // lv_obj_set_size(main_ui.mini_box.usb, lv_usb.header.w, lv_usb.header.h);
 
-    main_ui.mini_box.cell = lv_img_create(main_ui.mian_inter.main_mini_obx);
-    lv_img_set_src(main_ui.mini_box.cell,&cell);
-    lv_obj_align(main_ui.mini_box.cell,LV_ALIGN_RIGHT_MID,5,-2);
-    lv_obj_set_size(main_ui.mini_box.cell, cell.header.w, cell.header.h);
-    lv_obj_set_style_img_recolor(main_ui.mini_box.cell,lv_color_make(0,250,0),LV_STATE_DEFAULT);
-    lv_obj_set_style_img_recolor_opa(main_ui.mini_box.cell,LV_OPA_50,LV_STATE_DEFAULT);
+    // main_ui.mini_box.cell = lv_img_create(main_ui.mian_inter.main_mini_obx);
+    // lv_img_set_src(main_ui.mini_box.cell,&cell);
+    // lv_obj_align(main_ui.mini_box.cell,LV_ALIGN_RIGHT_MID,5,-2);
+    // lv_obj_set_size(main_ui.mini_box.cell, cell.header.w, cell.header.h);
+    // lv_obj_set_style_img_recolor(main_ui.mini_box.cell,lv_color_make(0,250,0),LV_STATE_DEFAULT);
+    // lv_obj_set_style_img_recolor_opa(main_ui.mini_box.cell,LV_OPA_50,LV_STATE_DEFAULT);
 
-    main_ui.mini_box.vioce = lv_img_create(main_ui.mian_inter.main_mini_obx);
-    lv_img_set_src(main_ui.mini_box.vioce,&novoice);
-    lv_obj_align_to(main_ui.mini_box.vioce,main_ui.mini_box.cell,LV_ALIGN_OUT_LEFT_MID,-10,0);
-    lv_obj_set_size(main_ui.mini_box.vioce, novoice.header.w, novoice.header.h);
+    // main_ui.mini_box.vioce = lv_img_create(main_ui.mian_inter.main_mini_obx);
+    // lv_img_set_src(main_ui.mini_box.vioce,&novoice);
+    // lv_obj_align_to(main_ui.mini_box.vioce,main_ui.mini_box.cell,LV_ALIGN_OUT_LEFT_MID,-10,0);
+    // lv_obj_set_size(main_ui.mini_box.vioce, novoice.header.w, novoice.header.h);
 
     /* 时间 */
     main_ui.mini_box.time = lv_label_create(main_ui.mian_inter.main_mini_obx);
@@ -483,7 +484,7 @@ void lv_mian_ui(void)
     lv_obj_set_style_outline_color(back_btn,lv_color_make(34,177,76),LV_STATE_DEFAULT);
     lv_obj_set_style_outline_opa(back_btn,LV_OPA_50,LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(back_btn,LV_OPA_50,LV_STATE_DEFAULT);
-    lv_obj_set_pos(back_btn, 50, 50);
+    lv_obj_set_pos(back_btn, 50, 100);
     lv_obj_move_foreground(back_btn);
     lv_obj_set_size(back_btn,50,50);
     lv_obj_add_event_cb(back_btn, lv_backbtn_control_event_handler, LV_EVENT_ALL, NULL);
