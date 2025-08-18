@@ -12,6 +12,8 @@ LV_IMG_DECLARE(lv_usb)
 LV_IMG_DECLARE(novoice)
 LV_IMG_DECLARE(cell)
 
+LV_IMG_DECLARE(Photo);
+
 extern lv_indev_t *indev_keypad;    /* 按键组 */
 extern uint32_t back_act_key;       /* 返回按键 */
 lv_group_t *ctrl_g;
@@ -71,7 +73,7 @@ void lv_msgbox_del(void)
 
     if (indev_keypad != NULL)
     {
-        for (int i = 0; i <= 2;i++)
+        for (int i = 0; i < main_ic0_num;i++)
         {
             lv_group_add_obj(ctrl_g, main_ui.mian_inter.ico[i]);
         }
@@ -100,7 +102,7 @@ void lv_display_box(void)
     lv_obj_clear_flag(main_ui.mian_inter.mian_imagebg_obx,LV_OBJ_FLAG_HIDDEN);
     if (indev_keypad != NULL)
     {
-        for (int i = 0; i <= 2;i++)
+        for (int i = 0; i < main_ic0_num;i++)
         {
             lv_group_add_obj(ctrl_g, main_ui.mian_inter.ico[i]);
         }
@@ -228,7 +230,7 @@ static void lv_imgbtn_control_event_handler(lv_event_t *event)
 
         if (indev_keypad != NULL)
         {
-            for (int i = 0; i <= 2;i++)
+            for (int i = 0; i < main_ic0_num;i++)
             {
                 lv_group_remove_obj(main_ui.mian_inter.ico[i]);
             }
@@ -245,7 +247,11 @@ static void lv_imgbtn_control_event_handler(lv_event_t *event)
                 break;
             
             case 2: /* photo app */
-                lv_photo_ui();
+                //lv_photo_ui();
+                lv_test_ui();
+                break;
+            case 3: /* test app */
+                lv_test_ui();
                 break;
             default:
                 break;
@@ -401,9 +407,31 @@ void lv_mian_ui(void)
     lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num],LV_OPA_50,LV_STATE_FOCUSED);
     lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
 
+
+    // lv_mian_ui() 函数中，在现有3个图标创建后添加：
+
+    ico_num++;  // 此时ico_num为3（新应用索引）
+
+    // 新增：创建新应用图标
+    main_ui.mian_inter.ico[ico_num] = lv_imgbtn_create(main_ui.mian_inter.mian_imagebg_obx);
+    // 设置图标资源（默认状态下显示new_app图片）
+    lv_imgbtn_set_src(main_ui.mian_inter.ico[ico_num], LV_IMGBTN_STATE_RELEASED, NULL, &Photo, NULL);
+    // 设置图标大小（与图片尺寸一致）
+    lv_obj_set_size(main_ui.mian_inter.ico[ico_num], Photo.header.w, Photo.header.h);
+    // 调整位置（示例：在第三个图标右侧居中对齐，间距为图片宽度的一半）
+    lv_obj_align_to(main_ui.mian_inter.ico[ico_num], main_ui.mian_inter.ico[ico_num - 1], 
+                    LV_ALIGN_OUT_RIGHT_MID, Photo.header.w / 2, 0);
+    // 设置聚焦时的背景透明度（与其他图标保持一致）
+    lv_obj_set_style_bg_opa(main_ui.mian_inter.ico[ico_num], LV_OPA_50, LV_STATE_FOCUSED);
+    // 绑定事件回调（复用现有逻辑）
+    lv_obj_add_event_cb(main_ui.mian_inter.ico[ico_num], lv_imgbtn_control_event_handler, LV_EVENT_ALL, NULL);
+
+
+
+
     if (indev_keypad != NULL)
     {
-        for (int i = 0; i <= 2;i++)
+        for (int i = 0; i < main_ic0_num;i++)
         {
             lv_group_add_obj(ctrl_g, main_ui.mian_inter.ico[i]);
         }
