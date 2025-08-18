@@ -9,7 +9,7 @@
 #include "lv_video_ui.h"
 #include "lv_test_ui.h"
 /* APP ICO number */
-#define main_ic0_num    4
+#define main_ic0_num    1
 
 typedef enum
 {
