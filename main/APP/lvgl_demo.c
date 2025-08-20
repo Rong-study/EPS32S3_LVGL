@@ -340,10 +340,11 @@ void lvgl_demo(void)
     xTaskCreate(lvgl_port_task, "LVGL", EXAMPLE_LVGL_TASK_STACK_SIZE, NULL, EXAMPLE_LVGL_TASK_PRIORITY, NULL);
 
     /* 锁定互斥锁，因为LVGL api不是线程安全的 */
-    // if (lvgl_mux_lock(-1))
-    // {
-    //     lv_start_ui();
-    //     /* 释放互斥锁 */
-    //     lvgl_mux_unlock();
-    // }
+    if (lvgl_mux_lock(-1))
+    {
+        //lv_test_ui();
+        lv_mian_ui();
+        /* 释放互斥锁 */
+        lvgl_mux_unlock();
+    }
 }

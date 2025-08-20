@@ -35,7 +35,7 @@
 #include "lv_start_ui.h"
 #include "lv_main_ui.h"
 #include "key.h"
-
+#include "lv_test_ui.h"
 
 extern lv_disp_drv_t disp_drv;      /* 回调函数的参数 */
 

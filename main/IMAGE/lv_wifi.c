@@ -103,8 +103,8 @@ const lv_img_dsc_t lv_wifi = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,
-  .header.w = 16,
-  .header.h = 16,
-  .data_size = 256 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+  .header.w = 32,
+  .header.h = 32,
+  .data_size = 1024 * LV_IMG_PX_SIZE_ALPHA_BYTE,
   .data = lv_wifi_map,
 };

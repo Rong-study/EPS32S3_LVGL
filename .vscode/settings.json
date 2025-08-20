@@ -24,7 +24,16 @@
     "uart_select.h": "c",
     "sstream": "c",
     "nvs_flash.h": "c",
-    "lcd_display.h": "c"
+    "lcd_display.h": "c",
+    "compare": "c",
+    "cstdint": "c",
+    "ranges": "c",
+    "span": "c",
+    "esp_log.h": "c",
+    "uart.h": "c",
+    "interrupts.h": "c",
+    "cstdlib": "c",
+    "stdint.h": "c"
 },
 "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
