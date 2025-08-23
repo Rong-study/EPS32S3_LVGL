@@ -33,7 +33,9 @@
     "uart.h": "c",
     "interrupts.h": "c",
     "cstdlib": "c",
-    "stdint.h": "c"
+    "stdint.h": "c",
+    "future": "c",
+    "system_error": "c"
 },
 "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"

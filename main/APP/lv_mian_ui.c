@@ -238,18 +238,18 @@ static void lv_imgbtn_control_event_handler(lv_event_t *event)
 
         switch(lv_trigger_bit)
         {
-            // case 0: /* usb_camera app */
-            //     usb_camera_ui();
-            //     break;
+        //     // case 0: /* usb_camera app */
+        //     //     usb_camera_ui();
+        //     //     break;
             
-            // case 1: /*  video app */
-            //     lv_video_ui();
-            //     break;
+        //     // case 1: /*  video app */
+        //     //     lv_video_ui();
+        //     //     break;
             
-            // case 2: /* photo app */
-            //     lv_photo_ui();
-            //     //lv_test_ui();
-            //     break;
+        //     // case 2: /* photo app */
+        //     //     lv_photo_ui();
+        //     //     //lv_test_ui();
+        //     //     break;
             case 0: /* test app */
                 lv_test_ui();
                 break;

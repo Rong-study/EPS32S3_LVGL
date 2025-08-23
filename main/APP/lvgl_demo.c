@@ -342,8 +342,8 @@ void lvgl_demo(void)
     /* 锁定互斥锁，因为LVGL api不是线程安全的 */
     if (lvgl_mux_lock(-1))
     {
-        //lv_test_ui();
-        lv_mian_ui();
+        lv_test_ui();
+        //lv_mian_ui();
         /* 释放互斥锁 */
         lvgl_mux_unlock();
     }
