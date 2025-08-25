@@ -1,4 +1,6 @@
 #include "lv_test_ui.h"
+#include <string.h> // 确保包含string.h头文件
+
 
 // 定义UI组件变量
 static lv_obj_t *ta_prefix;       // 第一行显示区域（CH1）
@@ -104,27 +106,27 @@ static void update_ui_timer(lv_timer_t *timer) {
         // 更新第一行显示区域（CH1）
         if (ta_prefix && lv_obj_is_valid(ta_prefix)) {
             // 手动拼接字符串
-            strcpy(display_text, "CH1：");
+            strcpy(display_text, "CH1:");
             strcat(display_text, prefix);
-            strcat(display_text, "V  状态：中位");
+            strcat(display_text, "V  状态:中位");
             lv_label_set_text(ta_prefix, display_text);
         }
         
         // 更新第二行显示区域（电机1）
         if (ta_first_line && lv_obj_is_valid(ta_first_line)) {
             // 手动拼接字符串
-            strcpy(display_text, "电机1：");
+            strcpy(display_text, "电机1:");
             strcat(display_text, prefix);
-            strcat(display_text, "V  状态：正常");
+            strcat(display_text, "V  状态:正常");
             lv_label_set_text(ta_first_line, display_text);
         }
         
         // 更新第三行显示区域（电机2）
         if (ta_full && lv_obj_is_valid(ta_full)) {
             // 手动拼接字符串
-            strcpy(display_text, "电机2：");
+            strcpy(display_text, "电机2:");
             strcat(display_text, prefix);
-            strcat(display_text, "V  状态：正常");
+            strcat(display_text, "V  状态:正常");
             lv_label_set_text(ta_full, display_text);
         }
         
@@ -179,7 +181,7 @@ void create_serial_monitor_ui(void) {
     
     // 创建主容器 - 使用Flex布局
     lv_obj_t *main_container = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(main_container, SCREEN_WIDTH, SCREEN_HEIGHT); // 高度320px
+    lv_obj_set_size(main_container, SCREEN_WIDTH, SCREEN_HEIGHT);
     lv_obj_set_pos(main_container, 0, 40); // 从顶部开始
     lv_obj_set_flex_flow(main_container, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(main_container, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -193,12 +195,19 @@ void create_serial_monitor_ui(void) {
     // 第一行显示区域（CH1）
     ta_prefix = lv_label_create(main_container);
     lv_obj_set_size(ta_prefix, SCREEN_WIDTH, ROW_HEIGHT);
-    lv_label_set_text(ta_prefix, "CH1：---V  状态：中位");
+    lv_label_set_text(ta_prefix, "CH1:---V  状态:中位");
     lv_obj_set_style_bg_color(ta_prefix, lv_color_hex(0x111111), LV_PART_MAIN);
     lv_obj_set_style_text_color(ta_prefix, lv_color_hex(0xFF0000), LV_PART_MAIN); // 红色字体
     lv_obj_set_style_pad_all(ta_prefix, 5, 0);
     lv_obj_set_style_radius(ta_prefix, 0, 0);
-    lv_obj_set_style_text_font(ta_prefix, &lv_font_montserrat_20, LV_PART_MAIN);
+    
+    // 使用支持中文的字体 - 替换为实际支持中文的字体
+    // 例如: extern lv_font_t my_chinese_font_20;
+    // lv_obj_set_style_text_font(ta_prefix, &my_chinese_font_20, LV_PART_MAIN);
+    
+    // 临时使用Montserrat字体（确保在lv_conf.h中启用）
+    //lv_obj_set_style_text_font(ta_prefix, &Simsun_16_CJK, LV_PART_MAIN);
+    
     lv_obj_set_style_text_align(ta_prefix, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
     lv_obj_clear_flag(ta_prefix, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
     lv_obj_set_style_align(ta_prefix, LV_ALIGN_CENTER, 0); // 垂直居中
@@ -206,12 +215,15 @@ void create_serial_monitor_ui(void) {
     // 第二行显示区域（电机1）
     ta_first_line = lv_label_create(main_container);
     lv_obj_set_size(ta_first_line, SCREEN_WIDTH, ROW_HEIGHT);
-    lv_label_set_text(ta_first_line, "电机1：---V  状态：正常");
+    lv_label_set_text(ta_first_line, "电机1:---V  状态:正常");
     lv_obj_set_style_bg_color(ta_first_line, lv_color_hex(0x111111), LV_PART_MAIN);
     lv_obj_set_style_text_color(ta_first_line, lv_color_hex(0xFF0000), LV_PART_MAIN); // 红色字体
     lv_obj_set_style_pad_all(ta_first_line, 5, 0);
     lv_obj_set_style_radius(ta_first_line, 0, 0);
-    lv_obj_set_style_text_font(ta_first_line, &lv_font_montserrat_20, LV_PART_MAIN);
+    
+    // 使用支持中文的字体
+    //lv_obj_set_style_text_font(ta_first_line, &lv_font_montserrat_20, LV_PART_MAIN);
+    
     lv_obj_set_style_text_align(ta_first_line, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
     lv_obj_clear_flag(ta_first_line, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
     lv_obj_set_style_align(ta_first_line, LV_ALIGN_CENTER, 0); // 垂直居中
@@ -219,12 +231,15 @@ void create_serial_monitor_ui(void) {
     // 第三行显示区域（电机2）
     ta_full = lv_label_create(main_container);
     lv_obj_set_size(ta_full, SCREEN_WIDTH, ROW_HEIGHT);
-    lv_label_set_text(ta_full, "电机2：---V  状态：正常");
+    lv_label_set_text(ta_full, "电机2:---V  状态:正常");
     lv_obj_set_style_bg_color(ta_full, lv_color_hex(0x111111), LV_PART_MAIN);
     lv_obj_set_style_text_color(ta_full, lv_color_hex(0xFF0000), LV_PART_MAIN); // 红色字体
     lv_obj_set_style_pad_all(ta_full, 5, 0);
     lv_obj_set_style_radius(ta_full, 0, 0);
-    lv_obj_set_style_text_font(ta_full, &lv_font_montserrat_20, LV_PART_MAIN);
+    
+    // 使用支持中文的字体
+    //lv_obj_set_style_text_font(ta_full, &lv_font_montserrat_20, LV_PART_MAIN);
+    
     lv_obj_set_style_text_align(ta_full, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
     lv_obj_clear_flag(ta_full, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
     lv_obj_set_style_align(ta_full, LV_ALIGN_CENTER, 0); // 垂直居中
