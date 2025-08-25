@@ -1,7 +1,7 @@
 {
-"C_Cpp.intelliSenseEngine": "Tag Parser",
-"idf.adapterTargetName": "esp32s3",
-"files.associations": {
+  "C_Cpp.intelliSenseEngine": "Tag Parser",
+  "idf.adapterTargetName": "esp32s3",
+  "files.associations": {
     "gpio.h": "c",
     "led.h": "c",
     "task.h": "c",
@@ -36,10 +36,23 @@
     "stdint.h": "c",
     "future": "c",
     "system_error": "c"
-},
-"idf.openOcdConfigs": [
+  },
+  "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
-],
-"idf.flashType": "UART",
-"idf.portWin": "COM6"
+  ],
+  "idf.flashType": "UART",
+  "idf.portWin": "COM6",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32s3"
+  },
+  "clangd.path": "/home/whx119022/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=/home/whx119022/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin/xtensa-esp32s3-elf-gcc",
+    "--compile-commands-dir=/home/whx119022/EPS32S3_LVGL/build"
+  ],
+  "idf.espIdfPath": "/home/whx119022/esp/esp-idf",
+  "idf.toolsPath": "/home/whx119022/.espressif",
+  "idf.pythonInstallPath": "/usr/bin/python",
+  "idf.port": "/dev/ttyACM0"
 }

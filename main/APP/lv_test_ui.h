@@ -31,7 +31,8 @@ static void close_btn_event_handler(lv_event_t *e);
 static void kb_event_handler(lv_event_t *e);
 static void ta_event_handler(lv_event_t *e);
 void add_serial_data(void);
-void clear_serial_buffer(void);
+//void clear_serial_buffer(void);
+static void clear_serial_buffer(lv_event_t *e) ;
 void create_serial_monitor_window(void);
 static void global_click_event_handler(lv_event_t *e);
 #endif /* __LV_TEST_UI_H */
