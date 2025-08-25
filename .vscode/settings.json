@@ -35,7 +35,8 @@
     "cstdlib": "c",
     "stdint.h": "c",
     "future": "c",
-    "system_error": "c"
+    "system_error": "c",
+    "functional": "c"
   },
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"

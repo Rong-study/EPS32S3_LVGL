@@ -1,13 +1,9 @@
 #include "lv_test_ui.h"
 
-
 // 定义UI组件变量
-static lv_obj_t *win;             // 窗口对象
-static lv_obj_t *ta_receive;      // 接收信息文本框
-static lv_obj_t *ta_send;         // 发送信息文本框
-static lv_obj_t *btn_send;        // 发送按钮
-static lv_obj_t *btn_clear;       // 清除按钮
-static lv_obj_t *kb;              // 键盘对象
+static lv_obj_t *ta_prefix;       // 第一行显示区域（CH1）
+static lv_obj_t *ta_first_line;   // 第二行显示区域（电机1）
+static lv_obj_t *ta_full;          // 第三行显示区域（电机2）
 
 // 任务和流缓冲区
 static TaskHandle_t serial_task_handle = NULL;
@@ -18,13 +14,16 @@ static lv_timer_t *update_timer = NULL;  // UI更新定时器
 #define STREAM_BUF_SIZE 4096     // 流缓冲区大小
 #define TRIGGER_LEVEL 128        // 触发级别
 #define UART_BUF_SIZE 512        // UART缓冲区大小
-#define MAX_DISPLAY_LINES 10    // 最大显示行数
 #define MAX_UPDATE_CHUNK 256     // 每次更新最大字节数
 
-// 优化结构：记录文本框关键状态
+// 屏幕尺寸
+#define SCREEN_WIDTH 320         // 宽度240px
+#define SCREEN_HEIGHT 240        // 高度320px
+#define ROW_HEIGHT ((SCREEN_HEIGHT-80) / 3)  // 每行高度约106.67px
+
+// 数据结构：记录接收数据状态
 typedef struct {
-    uint32_t line_count;           // 当前行数
-    char last_char;                // 最后一个字符（用于行数计算）
+    uint32_t last_update_tick;     // 上次更新时间
 } text_metrics_t;
 
 static text_metrics_t rx_metrics = {0};
@@ -32,88 +31,6 @@ static text_metrics_t rx_metrics = {0};
 // 检查串口是否初始化
 static bool is_uart_initialized(void) {
     return true; // 实际项目中需要实现
-}
-
-// 发送按钮事件处理
-static void send_btn_event_handler(lv_event_t *e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    if (code == LV_EVENT_CLICKED) {
-        const char *text = lv_textarea_get_text(ta_send);
-        if (text && *text) {
-            if (!is_uart_initialized()) {
-                return;
-            }
-
-            // 发送数据
-            uart_send_string(text);
-
-            // 在接收框显示发送的消息
-            char send_msg[128];
-            snprintf(send_msg, sizeof(send_msg), "> Sent: %s\n", text);
-            
-            // 直接添加到接收框
-            if (ta_receive && lv_obj_is_valid(ta_receive)) {
-                // 更新行数计数
-                rx_metrics.line_count++;
-                
-                lv_textarea_add_text(ta_receive, send_msg);
-                lv_textarea_set_cursor_pos(ta_receive, LV_TEXTAREA_CURSOR_LAST);
-            }
-
-            // 清空发送框
-            lv_textarea_set_text(ta_send, "");
-        }
-    }
-}
-
-// 键盘事件处理
-static void kb_event_handler(lv_event_t *e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *kb = lv_event_get_target(e);
-    
-    if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        if (ta_send) {
-            lv_obj_clear_state(ta_send, LV_STATE_FOCUSED);
-        }
-    }
-}
-
-// 全局点击事件处理 - 点击屏幕其他地方关闭键盘
-static void global_click_event_handler(lv_event_t *e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    
-    // 如果点击的不是键盘或发送文本框，则关闭键盘
-    if (code == LV_EVENT_CLICKED && kb && !lv_obj_has_flag(kb, LV_OBJ_FLAG_HIDDEN)) {
-        if (target != kb && target != ta_send && target != btn_send && target != btn_clear) {
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-            if (ta_send) {
-                lv_obj_clear_state(ta_send, LV_STATE_FOCUSED);
-            }
-        }
-    }
-}
-
-// 文本框焦点事件处理
-static void ta_event_handler(lv_event_t *e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * ta = lv_event_get_target(e);
-    
-    if (code == LV_EVENT_FOCUSED) {
-        if (kb) {
-            lv_keyboard_set_textarea(kb, ta);
-            lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
-            lv_obj_move_foreground(kb);
-        }
-    }
-    else if (code == LV_EVENT_DEFOCUSED) {
-        if (kb) {
-            lv_keyboard_set_textarea(kb, NULL);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        }
-    }
 }
 
 // 串口数据接收任务
@@ -140,36 +57,25 @@ void uart_receive_task(void *pvParameters) {
     }
 }
 
-// 清空接收缓冲区
-static void clear_serial_buffer(lv_event_t *e) {
-    if (ta_receive && lv_obj_is_valid(ta_receive)) {
-        lv_textarea_set_text(ta_receive, "Buffer cleared\nWaiting for data...");
-        // 重置行数计数
-        rx_metrics.line_count = 0;
-        rx_metrics.last_char = '\0';
-    }
-    // 清空流缓冲区
-    if (uart_stream_buf != NULL) {
-        xStreamBufferReset(uart_stream_buf);
-    }
-}
-
-// 计算新文本中的行数
-static uint32_t count_newlines(const char *buffer, size_t len, char *last_char) {
-    uint32_t count = 0;
+// 提取前三位数字
+static void extract_first_three_digits(const char *buffer, size_t len, char *output) {
+    size_t i = 0;
+    size_t out_idx = 0;
+    size_t digit_count = 0;
     
-    for (size_t i = 0; i < len; i++) {
-        // 只有当last_char不是\r且当前字符是\n时计数
-        if (*last_char != '\r' && buffer[i] == '\n') {
-            count++;
+    output[0] = '\0'; // 清空输出
+    
+    // 查找前三位数字
+    for (i = 0; i < len && digit_count < 3; i++) {
+        if (buffer[i] >= '0' && buffer[i] <= '9') {
+            output[out_idx++] = buffer[i];
+            digit_count++;
         }
-        *last_char = buffer[i];
     }
-    
-    return count;
+    output[out_idx] = '\0'; // 确保字符串结束
 }
 
-// LVGL定时器回调 - 安全更新UI（优化版本）
+// LVGL定时器回调 - 安全更新UI
 static void update_ui_timer(lv_timer_t *timer) {
     if (uart_stream_buf == NULL) return;
     
@@ -188,48 +94,43 @@ static void update_ui_timer(lv_timer_t *timer) {
         // 确保字符串以null结尾
         buffer[bytes_read] = '\0';
         
-        // 计算新增行数
-        uint32_t new_lines = count_newlines((char*)buffer, bytes_read, &rx_metrics.last_char);
-        rx_metrics.line_count += new_lines;
+        // 提取前三位数字
+        char prefix[4] = "";
+        extract_first_three_digits((char*)buffer, bytes_read, prefix);
         
-        // 安全更新UI
-        if (ta_receive && lv_obj_is_valid(ta_receive)) {
-            // 检查当前内容行数，如果超过最大值则清除
-            if (rx_metrics.line_count > MAX_DISPLAY_LINES) {
-                lv_textarea_set_text(ta_receive, "");
-                rx_metrics.line_count = new_lines; // 重置计数器
-            }
-            
-            // 直接添加文本到文本框
-            lv_textarea_add_text(ta_receive, (char*)buffer);
-            
-            // 只有在没有用户交互时才自动滚动
-            if (!lv_obj_is_scrolling(ta_receive)) {
-                lv_textarea_set_cursor_pos(ta_receive, LV_TEXTAREA_CURSOR_LAST);
-            }
+        // 创建显示文本缓冲区
+        char display_text[64];
+        
+        // 更新第一行显示区域（CH1）
+        if (ta_prefix && lv_obj_is_valid(ta_prefix)) {
+            // 手动拼接字符串
+            strcpy(display_text, "CH1：");
+            strcat(display_text, prefix);
+            strcat(display_text, "V  状态：中位");
+            lv_label_set_text(ta_prefix, display_text);
         }
+        
+        // 更新第二行显示区域（电机1）
+        if (ta_first_line && lv_obj_is_valid(ta_first_line)) {
+            // 手动拼接字符串
+            strcpy(display_text, "电机1：");
+            strcat(display_text, prefix);
+            strcat(display_text, "V  状态：正常");
+            lv_label_set_text(ta_first_line, display_text);
+        }
+        
+        // 更新第三行显示区域（电机2）
+        if (ta_full && lv_obj_is_valid(ta_full)) {
+            // 手动拼接字符串
+            strcpy(display_text, "电机2：");
+            strcat(display_text, prefix);
+            strcat(display_text, "V  状态：正常");
+            lv_label_set_text(ta_full, display_text);
+        }
+        
+        // 记录更新时间
+        rx_metrics.last_update_tick = lv_tick_get();
     }
-}
-
-// 优化版本 - 创建键盘对象
-static lv_obj_t* create_keyboard(lv_obj_t *parent) {
-    lv_obj_t *kb = lv_keyboard_create(parent);
-    
-    // 优化键盘样式
-    lv_obj_set_size(kb, lv_pct(95), 120);
-    lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
-    
-    // 设置键盘为透明背景
-    lv_obj_set_style_bg_opa(kb, LV_OPA_90, LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(kb, lv_color_hex(0x333333), LV_STATE_DEFAULT);
-    
-    // 设置按键样式
-    lv_obj_set_style_bg_color(kb, lv_color_hex(0x444444), LV_PART_ITEMS | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(kb, lv_color_white(), LV_PART_ITEMS | LV_STATE_DEFAULT);
-    
-    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-    
-    return kb;
 }
 
 // 销毁UI资源
@@ -253,150 +154,83 @@ static void destroy_ui_resources() {
     }
 }
 
-// 创建串口监控窗口
-void create_serial_monitor_window(void) {
+// 创建串口监控界面
+void create_serial_monitor_ui(void) {
     // 清除屏幕的滚动标志
     lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_SCROLLABLE);
     
-    // 如果窗口已存在，先关闭
-    if (win && lv_obj_is_valid(win)) {
+    // 如果UI已存在，先关闭
+    if (ta_prefix || ta_first_line || ta_full) {
         destroy_ui_resources();
-        lv_obj_del(win);
-        win = NULL;
+        if (ta_prefix && lv_obj_is_valid(ta_prefix)) lv_obj_del(ta_prefix);
+        if (ta_first_line && lv_obj_is_valid(ta_first_line)) lv_obj_del(ta_first_line);
+        if (ta_full && lv_obj_is_valid(ta_full)) lv_obj_del(ta_full);
+        ta_prefix = NULL;
+        ta_first_line = NULL;
+        ta_full = NULL;
     }
     
-    // 创建窗口
-    win = lv_win_create(lv_scr_act(), 20);
-    lv_win_add_title(win, "UART Monitor");
-    lv_obj_set_size(win, lv_pct(100), lv_pct(100));
-    lv_obj_center(win);
+    // 设置屏幕背景为黑色
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_100, LV_PART_MAIN);
     
-    // 优化窗口样式
-    lv_obj_set_style_bg_color(win, lv_color_hex(0x222222), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(win, LV_OPA_90, LV_PART_MAIN);
-    lv_obj_set_style_border_width(win, 1, LV_PART_MAIN);
-    lv_obj_set_style_border_color(win, lv_color_hex(0x444444), LV_PART_MAIN);
-   // 禁用窗口的滚动功能 - 使用更可靠的方法
-    lv_obj_clear_flag(win, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_clear_flag(win, LV_OBJ_FLAG_SCROLL_ELASTIC);
-    lv_obj_clear_flag(win, LV_OBJ_FLAG_SCROLL_MOMENTUM);
-    lv_obj_clear_flag(win, LV_OBJ_FLAG_SCROLL_CHAIN);
-
-    // 禁用窗口的滚动功能
-    lv_obj_clear_flag(win, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_clear_flag(lv_win_get_content(win), LV_OBJ_FLAG_SCROLLABLE);
+    // 禁用屏幕的滚动功能
+    lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_SCROLLABLE);
     
-    // 设置窗口内容样式
-    lv_obj_set_style_pad_all(lv_win_get_content(win), 5, 0);
-
     // 创建主容器 - 使用Flex布局
-    lv_obj_t *main_container = lv_obj_create(lv_win_get_content(win));
-    lv_obj_set_size(main_container, lv_pct(100), lv_pct(100));
+    lv_obj_t *main_container = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(main_container, SCREEN_WIDTH, SCREEN_HEIGHT); // 高度320px
+    lv_obj_set_pos(main_container, 0, 40); // 从顶部开始
     lv_obj_set_flex_flow(main_container, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(main_container, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_all(main_container, 0, 0);
     lv_obj_set_style_border_width(main_container, 0, 0);
-    lv_obj_set_style_bg_opa(main_container, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_bg_color(main_container, lv_color_black(), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(main_container, LV_OPA_100, LV_PART_MAIN);
+    lv_obj_clear_flag(main_container, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
 
-    // 创建接收文本框容器
-    lv_obj_t *receive_container = lv_obj_create(main_container);
-    lv_obj_set_size(receive_container, lv_pct(100), lv_pct(70));
-    lv_obj_set_style_pad_all(receive_container, 0, 0);
-    lv_obj_set_style_border_width(receive_container, 0, 0);
-    lv_obj_set_style_bg_opa(receive_container, LV_OPA_TRANSP, 0);
+    // 创建三行显示区域（均分屏幕高度）
+    // 第一行显示区域（CH1）
+    ta_prefix = lv_label_create(main_container);
+    lv_obj_set_size(ta_prefix, SCREEN_WIDTH, ROW_HEIGHT);
+    lv_label_set_text(ta_prefix, "CH1：---V  状态：中位");
+    lv_obj_set_style_bg_color(ta_prefix, lv_color_hex(0x111111), LV_PART_MAIN);
+    lv_obj_set_style_text_color(ta_prefix, lv_color_hex(0xFF0000), LV_PART_MAIN); // 红色字体
+    lv_obj_set_style_pad_all(ta_prefix, 5, 0);
+    lv_obj_set_style_radius(ta_prefix, 0, 0);
+    lv_obj_set_style_text_font(ta_prefix, &lv_font_montserrat_20, LV_PART_MAIN);
+    lv_obj_set_style_text_align(ta_prefix, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_clear_flag(ta_prefix, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
+    lv_obj_set_style_align(ta_prefix, LV_ALIGN_CENTER, 0); // 垂直居中
 
-    // 创建接收文本框
-    ta_receive = lv_textarea_create(receive_container);
-    lv_obj_set_size(ta_receive, lv_pct(100), lv_pct(100));
-    lv_textarea_set_text(ta_receive, "Waiting For Data...");
-    
-    // 优化接收文本框样式
-    lv_obj_set_style_bg_color(ta_receive, lv_color_hex(0x111111), LV_PART_MAIN);
-    lv_obj_set_style_border_color(ta_receive, lv_color_hex(0x444444), LV_PART_MAIN);
-    lv_obj_set_style_text_color(ta_receive, lv_color_hex(0xEEEEEE), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(ta_receive, LV_OPA_100, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(ta_receive, 5, 0);
-    
-    lv_textarea_set_cursor_click_pos(ta_receive, false);
-    lv_textarea_set_placeholder_text(ta_receive, "No data received");
-    lv_obj_set_scrollbar_mode(ta_receive, LV_SCROLLBAR_MODE_AUTO);
-    lv_textarea_set_one_line(ta_receive, false);
-    lv_obj_add_flag(ta_receive, LV_OBJ_FLAG_EVENT_BUBBLE);
+    // 第二行显示区域（电机1）
+    ta_first_line = lv_label_create(main_container);
+    lv_obj_set_size(ta_first_line, SCREEN_WIDTH, ROW_HEIGHT);
+    lv_label_set_text(ta_first_line, "电机1：---V  状态：正常");
+    lv_obj_set_style_bg_color(ta_first_line, lv_color_hex(0x111111), LV_PART_MAIN);
+    lv_obj_set_style_text_color(ta_first_line, lv_color_hex(0xFF0000), LV_PART_MAIN); // 红色字体
+    lv_obj_set_style_pad_all(ta_first_line, 5, 0);
+    lv_obj_set_style_radius(ta_first_line, 0, 0);
+    lv_obj_set_style_text_font(ta_first_line, &lv_font_montserrat_20, LV_PART_MAIN);
+    lv_obj_set_style_text_align(ta_first_line, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_clear_flag(ta_first_line, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
+    lv_obj_set_style_align(ta_first_line, LV_ALIGN_CENTER, 0); // 垂直居中
 
-    // 创建底部容器 - 用于发送区域
-    lv_obj_t *bottom_container = lv_obj_create(main_container);
-    lv_obj_set_size(bottom_container, lv_pct(100), lv_pct(30));
-    lv_obj_set_flex_flow(bottom_container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(bottom_container, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(bottom_container, 0, 0);
-    lv_obj_set_style_border_width(bottom_container, 0, 0);
-    lv_obj_set_style_bg_opa(bottom_container, LV_OPA_TRANSP, 0);
+    // 第三行显示区域（电机2）
+    ta_full = lv_label_create(main_container);
+    lv_obj_set_size(ta_full, SCREEN_WIDTH, ROW_HEIGHT);
+    lv_label_set_text(ta_full, "电机2：---V  状态：正常");
+    lv_obj_set_style_bg_color(ta_full, lv_color_hex(0x111111), LV_PART_MAIN);
+    lv_obj_set_style_text_color(ta_full, lv_color_hex(0xFF0000), LV_PART_MAIN); // 红色字体
+    lv_obj_set_style_pad_all(ta_full, 5, 0);
+    lv_obj_set_style_radius(ta_full, 0, 0);
+    lv_obj_set_style_text_font(ta_full, &lv_font_montserrat_20, LV_PART_MAIN);
+    lv_obj_set_style_text_align(ta_full, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_clear_flag(ta_full, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
+    lv_obj_set_style_align(ta_full, LV_ALIGN_CENTER, 0); // 垂直居中
 
-    // 创建发送文本框容器
-    lv_obj_t *send_container = lv_obj_create(bottom_container);
-    lv_obj_set_size(send_container, lv_pct(65), LV_SIZE_CONTENT);
-    lv_obj_set_flex_grow(send_container, 1);
-    lv_obj_set_style_pad_all(send_container, 0, 0);
-    lv_obj_set_style_border_width(send_container, 0, 0);
-    lv_obj_set_style_bg_opa(send_container, LV_OPA_TRANSP, 0);
-
-    // 创建发送文本框
-    ta_send = lv_textarea_create(send_container);
-    lv_obj_set_size(ta_send, lv_pct(100), LV_SIZE_CONTENT);
-    lv_textarea_set_placeholder_text(ta_send, "Enter message...");
-    lv_textarea_set_one_line(ta_send, true); // 单行模式
-    lv_obj_add_event_cb(ta_send, ta_event_handler, LV_EVENT_FOCUSED, NULL);
-    lv_obj_add_event_cb(ta_send, ta_event_handler, LV_EVENT_DEFOCUSED, NULL);
-    
-    // 优化发送文本框样式
-    lv_obj_set_style_bg_color(ta_send, lv_color_hex(0x333333), LV_PART_MAIN);
-    lv_obj_set_style_text_color(ta_send, lv_color_white(), LV_PART_MAIN);
-    lv_obj_set_style_pad_all(ta_send, 10, LV_PART_MAIN);
-    lv_obj_set_style_radius(ta_send, 5, LV_PART_MAIN);
-    
-    // 创建按钮容器
-    lv_obj_t *btn_container = lv_obj_create(bottom_container);
-    lv_obj_set_size(btn_container, lv_pct(35), LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(btn_container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(btn_container, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(btn_container, 0, 0);
-    lv_obj_set_style_border_width(btn_container, 0, 0);
-    lv_obj_set_style_bg_opa(btn_container, LV_OPA_TRANSP, 0);
-
-    // 创建发送按钮
-    btn_send = lv_btn_create(btn_container);
-    lv_obj_set_size(btn_send, lv_pct(50), 40);
-    lv_obj_t *label_send = lv_label_create(btn_send);
-    lv_label_set_text(label_send, "Send");
-    lv_obj_add_event_cb(btn_send, send_btn_event_handler, LV_EVENT_CLICKED, NULL);
-    
-    // 优化按钮样式
-    lv_obj_set_style_bg_color(btn_send, lv_color_hex(0x4CAF50), LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(btn_send, lv_color_white(), LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(btn_send, 5, LV_STATE_DEFAULT);
-
-    // 创建清除按钮
-    btn_clear = lv_btn_create(btn_container);
-    lv_obj_set_size(btn_clear, lv_pct(50), 40);
-    lv_obj_t *label_clear = lv_label_create(btn_clear);
-    lv_label_set_text(label_clear, "Clear");
-    lv_obj_add_event_cb(btn_clear, clear_serial_buffer, LV_EVENT_CLICKED, NULL);
-    
-    // 优化按钮样式
-    lv_obj_set_style_bg_color(btn_clear, lv_color_hex(0x2196F3), LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(btn_clear, lv_color_white(), LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(btn_clear, 5, LV_STATE_DEFAULT);
-
-    // 在窗口内创建键盘
-    kb = create_keyboard(lv_win_get_content(win));
-    lv_obj_add_event_cb(kb, kb_event_handler, LV_EVENT_ALL, NULL);
-    
-    // 添加全局点击事件 - 点击其他地方关闭键盘
-    lv_obj_add_event_cb(lv_scr_act(), global_click_event_handler, LV_EVENT_CLICKED, NULL);
-    
-    // 重置行数计数
-    rx_metrics.line_count = 0;
-    rx_metrics.last_char = '\0';
+    // 初始化缓冲区
+    memset(&rx_metrics, 0, sizeof(rx_metrics));
 }
 
 // 主启动程序
@@ -407,12 +241,11 @@ void lv_test_ui(void) {
         uart_stream_buf = xStreamBufferCreate(STREAM_BUF_SIZE, TRIGGER_LEVEL);
     }
     
-    // 创建串口监控窗口
-    create_serial_monitor_window();
+    // 创建串口监控界面
+    create_serial_monitor_ui();
     
     // 创建LVGL定时器用于安全更新UI
     if (update_timer == NULL) {
-        // 提高定时器频率为20ms以提高响应性
         update_timer = lv_timer_create(update_ui_timer, 20, NULL);
         lv_timer_set_repeat_count(update_timer, -1); // 无限重复
     }
